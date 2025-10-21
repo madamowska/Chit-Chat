@@ -1,0 +1,20 @@
+syntax = "proto3";
+package chitchat;
+option go_package = "a3/grpc/chitchat";
+
+message ChatMessage {
+  string client_id = 1;    
+  string content = 2;      
+  int64 logical_time = 3;  
+  MessageType type = 4;    
+}
+
+enum MessageType {
+  CONNECT = 0;
+  DISCONNECT = 1;
+  MESSAGE = 2;
+}
+
+service ChitChatService {
+  rpc Message(stream ChatMessage) returns (stream ChatMessage);
+}

@@ -1,6 +1,6 @@
 syntax = "proto3";
 package chitchat;
-option go_package = "a3/grpc/chitchat";
+option go_package = "Chit-Chat/grpc/chitchat";
 
 message ChatMessage {
   string client_id = 1;    
@@ -18,3 +18,4 @@ enum MessageType {
 service ChitChatService {
   rpc Message(stream ChatMessage) returns (stream ChatMessage);
 }
+

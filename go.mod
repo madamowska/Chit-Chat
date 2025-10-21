@@ -1,4 +1,4 @@
-module a3
+module Chit-Chat
 
 go 1.25.1
 

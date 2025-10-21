@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"a3/grpc/chitchat"
+	"Chit-Chat/grpc/chitchat"
 )
 
 func main() {

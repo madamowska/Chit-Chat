@@ -17,7 +17,7 @@ import (
 
 func main() {
 
-	conn, err := grpc.Dial("localhost:7000", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial("localhost:7001", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not work")
 	}
@@ -33,13 +33,13 @@ func main() {
 	clientID := fmt.Sprintf("Client-%d", time.Now().UnixNano()) // i wanted to make the client ids sequential but it's more work so i just used random ids based on timestamp (so unique)
 	lamport := int64(0)
 
-	lamport++
 	stream.Send(&chitchat.ChatMessage{
 		ClientId:    clientID,
 		Content:     "",
 		LogicalTime: lamport,
 		Type:        chitchat.MessageType_CONNECT,
 	})
+	lamport++
 
 	go func() {
 		for {

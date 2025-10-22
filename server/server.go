@@ -67,19 +67,17 @@ func main() {
 	go server.startBroadcastLoop()
 
 	grpcServer := grpc.NewServer()
-	listener, err := net.Listen("tcp", ":7000")
+	listener, err := net.Listen("tcp", ":7001")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
 	chitchat.RegisterChitChatServiceServer(grpcServer, server)
 
-	log.Printf("[Lamport: %d] Server started on port 7000", server.lamport)
-
+	log.Printf("[Lamport: %d] Server started on port 7001", server.lamport)
+	
 	err = grpcServer.Serve(listener)
-	if err != nil {
-		log.Printf("[Lamport: %d] server shutdown", server.lamport)
-	}
+	log.Printf("[Lamport: %d] server shutdown", server.lamport)
 
 }
 
@@ -93,6 +91,7 @@ func (s *ChitChatServer) startBroadcastLoop() {
 				LogicalTime: s.lamport,
 				Type:        chitchat.MessageType_CONNECT,
 			}
+			s.lamport++
 			s.broadcast(connectMsg)
 		case msg := <-s.message:
 			s.lamport++
@@ -104,6 +103,7 @@ func (s *ChitChatServer) startBroadcastLoop() {
 				LogicalTime: s.lamport,
 				Type:        chitchat.MessageType_DISCONNECT,
 			}
+			s.lamport++
 			s.broadcast(disconnectMsg)
 			delete(s.clients, msg.ClientId)
 		}

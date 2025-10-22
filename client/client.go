@@ -45,7 +45,7 @@ func main() {
 		for {
 			msg, err := stream.Recv()
 			if err != nil {
-				log.Printf("Disconnected from server: %v", err)
+				fmt.Printf("[Lamport: %d] server shutdown", lamport)
 				return
 			}
 

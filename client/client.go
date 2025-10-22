@@ -30,7 +30,7 @@ func main() {
 		log.Fatalf("did not work")
 	}
 
-	clientID := fmt.Sprintf("Client-%d", time.Now().UnixNano()) // i wanted to make the client ids sequential but it's more work so i just used random ids based on timestamp (so unique)
+	clientID := fmt.Sprintf("%d", time.Now().UnixNano()) // i wanted to make the client ids sequential but it's more work so i just used random ids based on timestamp (so unique)
 	lamport := int64(0)
 
 	lamport++
@@ -43,19 +43,23 @@ func main() {
 
 	go func() {
 		for {
-			in, err := stream.Recv()
+			msg, err := stream.Recv()
 			if err != nil {
 				log.Printf("Disconnected from server: %v", err)
 				return
 			}
 
 			// Lamport clock update (match server behavior)
-			if in.LogicalTime > lamport {
-				lamport = in.LogicalTime
+			if msg.LogicalTime > lamport {
+				lamport = msg.LogicalTime
 			}
 			lamport++
 
-			log.Printf("[%d] %s: %s", in.LogicalTime, in.ClientId, in.Content)
+			if msg.Type == chitchat.MessageType_MESSAGE {
+				fmt.Printf("[Lamport: %d] Client %s: %s\n", msg.LogicalTime, msg.ClientId, msg.Content)
+			} else {
+				fmt.Printf("[Lamport: %d] %s\n", msg.LogicalTime, msg.Content)
+			}
 		}
 	}()
 
@@ -66,7 +70,7 @@ func main() {
 			if text == "" {
 				continue
 			}
-			
+
 			if len(text) > 128 {
 				log.Printf("Message exceeds 128 characters. Message has not been sent.")
 				continue

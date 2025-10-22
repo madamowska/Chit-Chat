@@ -74,11 +74,12 @@ func main() {
 
 	chitchat.RegisterChitChatServiceServer(grpcServer, server)
 
+	log.Printf("[Lamport: %d] Server started on port 7000", server.lamport)
+
 	err = grpcServer.Serve(listener)
 	if err != nil {
-		log.Fatalf("did not work: %v", err)
+		log.Printf("[Lamport: %d] server shutdown", server.lamport)
 	}
-	log.Println("Server started on port 7000")
 
 }
 

@@ -46,6 +46,7 @@ func (s *ChitChatServer) Message(stream chitchat.ChitChatService_MessageServer) 
 				log.Printf("message too long")
 				continue
 			}
+			s.message <- msg
 		case chitchat.MessageType_DISCONNECT:
 			s.disconnect <- msg
 			return nil

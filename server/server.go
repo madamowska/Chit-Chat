@@ -42,7 +42,10 @@ func (s *ChitChatServer) Message(stream chitchat.ChitChatService_MessageServer) 
 			s.clients[msg.ClientId] = stream
 			s.connect <- msg
 		case chitchat.MessageType_MESSAGE:
-			s.message <- msg
+			if len(msg.Content) > 128 {
+				log.Printf("message too long")
+				continue
+			}
 		case chitchat.MessageType_DISCONNECT:
 			s.disconnect <- msg
 			return nil

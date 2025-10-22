@@ -90,7 +90,6 @@ func main() {
 
 	<-stop
 	grpcServer.GracefulStop()
-	server.lamport++
 	log.Printf("[Lamport: %d] Server has shut down", server.lamport)
 }
 
@@ -98,6 +97,7 @@ func (s *ChitChatServer) startBroadcastLoop() {
 	for {
 		select {
 		case msg := <-s.connect:
+			s.lamport++
 			connectMsg := &chitchat.ChatMessage{
 				ClientId:    msg.ClientId,
 				Content:     "Participant " + msg.ClientId + " joined Chit Chat at logical time " + strconv.FormatInt(s.lamport, 10),
@@ -105,17 +105,17 @@ func (s *ChitChatServer) startBroadcastLoop() {
 				Type:        chitchat.MessageType_CONNECT,
 			}
 			s.broadcast(connectMsg)
-			s.lamport++
 		case msg := <-s.message:
+			s.lamport++
 			s.broadcast(msg)
 		case msg := <-s.disconnect:
+			s.lamport++
 			disconnectMsg := &chitchat.ChatMessage{
 				ClientId:    msg.ClientId,
 				Content:     "Participant " + msg.ClientId + " left Chit Chat at logical time " + strconv.FormatInt(s.lamport, 10),
 				LogicalTime: s.lamport,
 				Type:        chitchat.MessageType_DISCONNECT,
 			}
-			s.lamport++
 			s.broadcast(disconnectMsg)
 			delete(s.clients, msg.ClientId)
 		}

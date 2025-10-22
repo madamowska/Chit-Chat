@@ -4,6 +4,9 @@ import (
 	"log"
 	"net"
 	"strconv"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"Chit-Chat/grpc/chitchat"
 
@@ -76,9 +79,19 @@ func main() {
 
 	log.Printf("[Lamport: %d] Server started on port 7001", server.lamport)
 	
-	err = grpcServer.Serve(listener)
-	log.Printf("[Lamport: %d] server shutdown", server.lamport)
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
 
+	go func() {
+		if err := grpcServer.Serve(listener); err != nil {
+			log.Fatalf("did not work")
+		}
+	}()
+
+	<-stop
+	grpcServer.GracefulStop()
+	server.lamport++
+	log.Printf("[Lamport: %d] Server has shut down", server.lamport)
 }
 
 func (s *ChitChatServer) startBroadcastLoop() {
@@ -91,10 +104,9 @@ func (s *ChitChatServer) startBroadcastLoop() {
 				LogicalTime: s.lamport,
 				Type:        chitchat.MessageType_CONNECT,
 			}
-			s.lamport++
 			s.broadcast(connectMsg)
-		case msg := <-s.message:
 			s.lamport++
+		case msg := <-s.message:
 			s.broadcast(msg)
 		case msg := <-s.disconnect:
 			disconnectMsg := &chitchat.ChatMessage{

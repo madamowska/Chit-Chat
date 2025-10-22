@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net"
 
@@ -62,7 +63,7 @@ func main() {
 	go server.startBroadcastLoop()
 
 	grpcServer := grpc.NewServer()
-	listener, err := net.Listen("tcp", ":7000")
+	listener, err := net.Listen("tcp", ":7001")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
@@ -73,7 +74,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("did not work: %v", err)
 	}
-	log.Println("Server started on port 7000")
+	log.Println("Server started on port 7001")
 
 }
 
@@ -81,22 +82,26 @@ func (s *ChitChatServer) startBroadcastLoop() {
 	for {
 		select {
 		case msg := <-s.connect:
-			s.lamport++
+			// Lamport clock update: max of local and received time, then increment
+			s.lamport = max(s.lamport, msg.LogicalTime) + 1
 			connectMsg := &chitchat.ChatMessage{
 				ClientId:    msg.ClientId,
-				Content:     "Participant " + msg.ClientId + " joined the conversation",
+				Content:     fmt.Sprintf("Participant %s joined Chit Chat at logical time %d", msg.ClientId, s.lamport),
 				LogicalTime: s.lamport,
 				Type:        chitchat.MessageType_CONNECT,
 			}
 			s.broadcast(connectMsg)
 		case msg := <-s.message:
-			s.lamport++
+			// Lamport clock update: max of local and received time, then increment
+			s.lamport = max(s.lamport, msg.LogicalTime) + 1
+			msg.LogicalTime = s.lamport
 			s.broadcast(msg)
 		case msg := <-s.disconnect:
-			s.lamport++
+			// Lamport clock update: max of local and received time, then increment
+			s.lamport = max(s.lamport, msg.LogicalTime) + 1
 			disconnectMsg := &chitchat.ChatMessage{
 				ClientId:    msg.ClientId,
-				Content:     "Participant " + msg.ClientId + " left the conversation",
+				Content:     fmt.Sprintf("Participant %s left Chit Chat at logical time %d", msg.ClientId, s.lamport),
 				LogicalTime: s.lamport,
 				Type:        chitchat.MessageType_DISCONNECT,
 			}

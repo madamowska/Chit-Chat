@@ -17,7 +17,7 @@ import (
 
 func main() {
 
-	conn, err := grpc.Dial("localhost:7000", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient("localhost:7001", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not work")
 	}
@@ -49,11 +49,8 @@ func main() {
 				return
 			}
 
-			// Lamport clock update (match server behavior)
-			if in.LogicalTime > lamport {
-				lamport = in.LogicalTime
-			}
-			lamport++
+			// Lamport clock update: set to max of local and received time, then increment
+			lamport = max(lamport, in.LogicalTime) + 1
 
 			log.Printf("[%d] %s: %s", in.LogicalTime, in.ClientId, in.Content)
 		}

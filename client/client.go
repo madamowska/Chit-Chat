@@ -63,6 +63,11 @@ func main() {
 			if text == "" {
 				continue
 			}
+			
+			if len(text) > 128 {
+				log.Printf("Message exceeds 128 characters. Message has not been sent.")
+				continue
+			}
 
 			lamport++
 			err := stream.Send(&chitchat.ChatMessage{

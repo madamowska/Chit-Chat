@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net"
+	"strconv"
 
 	"Chit-Chat/grpc/chitchat"
 
@@ -81,10 +82,9 @@ func (s *ChitChatServer) startBroadcastLoop() {
 	for {
 		select {
 		case msg := <-s.connect:
-			s.lamport++
 			connectMsg := &chitchat.ChatMessage{
 				ClientId:    msg.ClientId,
-				Content:     "Participant " + msg.ClientId + " joined the conversation",
+				Content:     "Participant " + msg.ClientId + " joined Chit Chat at logical time " + strconv.FormatInt(s.lamport, 10),
 				LogicalTime: s.lamport,
 				Type:        chitchat.MessageType_CONNECT,
 			}
@@ -93,10 +93,9 @@ func (s *ChitChatServer) startBroadcastLoop() {
 			s.lamport++
 			s.broadcast(msg)
 		case msg := <-s.disconnect:
-			s.lamport++
 			disconnectMsg := &chitchat.ChatMessage{
 				ClientId:    msg.ClientId,
-				Content:     "Participant " + msg.ClientId + " left the conversation",
+				Content:     "Participant " + msg.ClientId + " left Chit Chat at logical time " + strconv.FormatInt(s.lamport, 10),
 				LogicalTime: s.lamport,
 				Type:        chitchat.MessageType_DISCONNECT,
 			}

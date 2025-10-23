@@ -1,0 +1,5 @@
+[2025-10-23 13:56:07] [Lamport: 2] Participant 1761220567085719100 joined Chit Chat at logical time 2
+[2025-10-23 13:56:35] [Lamport: 3] Client 1761220567085719100 sent message: s
+[2025-10-23 13:56:35] [Lamport: 4] Receiving message from 1761220567085719100: s
+[2025-10-23 13:56:43] [Lamport: 5] Participant 1761220603202114000 joined Chit Chat at logical time 5
+[2025-10-23 13:56:50] [Lamport: 7] Receiving message from 1761220603202114000: zs

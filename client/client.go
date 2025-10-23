@@ -42,23 +42,20 @@ func main() {
 
 	go func() {
 		for {
-			in, err := stream.Recv()
+			msg, err := stream.Recv()
 			if err != nil {
 				lamport++
 				fmt.Printf("[Lamport: %d] Server has shut down\n", lamport)
 				return
 			}
 
-			if in.LogicalTime > lamport {
-				lamport = in.LogicalTime - 1 // -1 because we will increment below
-			}
+			lamport = max(lamport, msg.LogicalTime)
 
-			if in.Type == chitchat.MessageType_MESSAGE {
+			if msg.Type == chitchat.MessageType_MESSAGE {
 				lamport++
-				fmt.Printf("[Lamport: %d] %s: %s\n", in.LogicalTime, in.ClientId, in.Content)
+				fmt.Printf("[Lamport: %d] Receiving message from %s: %s\n", lamport, msg.ClientId, msg.Content)
 			} else {
-				lamport++
-				fmt.Printf("[Lamport: %d] %s\n", in.LogicalTime, in.Content)
+				fmt.Printf("[Lamport: %d] %s\n", lamport, msg.Content)
 			}
 		}
 	}()
@@ -71,6 +68,8 @@ func main() {
 				continue
 			}
 
+			lamport++
+			fmt.Printf("[Lamport: %d] Client %s sent message: %s\n", lamport, clientID, text)
 			err := stream.Send(&chitchat.ChatMessage{
 				ClientId:    clientID,
 				Content:     text,

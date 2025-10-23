@@ -1,0 +1,3 @@
+[2025-10-23 13:50:43] [Lamport: 3] Participant 1761220243520834600 joined Chit Chat at logical time 3
+[2025-10-23 13:50:50] [Lamport: 6] Receiving message from 1761220230224340200: f
+[2025-10-23 13:55:47] [Lamport: 6] Participant 1761220230224340200 left Chit Chat at logical time 6

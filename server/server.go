@@ -62,6 +62,14 @@ func (s *ChitChatServer) Message(stream chitchat.ChitChatService_MessageServer) 
 
 func main() {
 
+	// Create and configure log file
+	logFile, err := os.Create("server.log")
+	if err != nil {
+		log.Fatalf("Failed to create log file: %v", err)
+	}
+	defer logFile.Close()
+	log.SetOutput(logFile) // Configure log to write to file
+
 	server := &ChitChatServer{
 		clients:    make(map[string]chitchat.ChitChatService_MessageServer),
 		connect:    make(chan *chitchat.ChatMessage),
@@ -80,6 +88,7 @@ func main() {
 	chitchat.RegisterChitChatServiceServer(grpcServer, server)
 
 	fmt.Printf("[Lamport: %d] Server started on port 7001\n", server.lamport)
+	log.Printf("[Lamport: %d] Server started on port 7001", server.lamport)
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
@@ -95,26 +104,31 @@ func main() {
 	grpcServer.Stop()
 	server.lamport++
 	fmt.Printf("[Lamport: %d] Server has shut down\n", server.lamport)
+	log.Printf("[Lamport: %d] Server has shut down", server.lamport)
 }
 
 func (s *ChitChatServer) startBroadcastLoop() {
 	for {
 		select {
 		case msg := <-s.connect:
-			s.lamport++
+			s.lamport = max(s.lamport, msg.LogicalTime) + 1
 			connectMsg := &chitchat.ChatMessage{
 				ClientId:    msg.ClientId,
 				Content:     "Participant " + msg.ClientId + " joined Chit Chat at logical time " + strconv.FormatInt(s.lamport, 10),
 				LogicalTime: s.lamport,
 				Type:        chitchat.MessageType_CONNECT,
 			}
+			log.Printf("Participant %s joined Chit Chat at logical time %d", msg.ClientId, s.lamport)
 			s.broadcast(connectMsg)
 		case msg := <-s.message:
-			s.lamport++
+			s.lamport = max(s.lamport, msg.LogicalTime) + 1
+			log.Printf("Message from %s at logical time %d: %s", msg.ClientId, s.lamport, msg.Content)
 			s.broadcast(msg)
 		case msg := <-s.disconnect:
+			s.lamport = max(s.lamport, msg.LogicalTime)
 			if !s.shutdown {
 				s.lamport++
+				log.Printf("Participant %s left Chit Chat at logical time %d", msg.ClientId, s.lamport)
 			}
 			disconnectMsg := &chitchat.ChatMessage{
 				ClientId:    msg.ClientId,
@@ -129,7 +143,6 @@ func (s *ChitChatServer) startBroadcastLoop() {
 }
 
 func (s *ChitChatServer) broadcast(msg *chitchat.ChatMessage) {
-	msg.LogicalTime = s.lamport
 	for _, clientStream := range s.clients {
 		clientStream.Send(msg)
 	}

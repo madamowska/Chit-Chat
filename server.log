@@ -1,0 +1,6 @@
+2025/10/23 14:10:24 [Lamport: 0] Server started on port 7001
+2025/10/23 14:10:31 Participant 1761221431788904300 joined Chit Chat at logical time 1
+2025/10/23 14:10:34 Participant 1761221434562224700 joined Chit Chat at logical time 2
+2025/10/23 14:10:36 Message from 1761221431788904300 at logical time 4: s
+2025/10/23 14:10:39 Participant 1761221431788904300 left Chit Chat at logical time 5
+2025/10/23 14:10:42 [Lamport: 6] Server has shut down

@@ -1,5 +1,0 @@
-[2025-10-23 13:56:43] [Lamport: 5] Participant 1761220603202114000 joined Chit Chat at logical time 5
-[2025-10-23 13:56:50] [Lamport: 6] Client 1761220603202114000 sent message: zs
-[2025-10-23 13:56:50] [Lamport: 7] Receiving message from 1761220603202114000: zs
-[2025-10-23 14:02:17] [Lamport: 8] Participant 1761220567085719100 left Chit Chat at logical time 8
-[2025-10-23 14:02:19] [Lamport: 9] Server has shut down

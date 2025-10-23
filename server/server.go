@@ -22,6 +22,7 @@ type ChitChatServer struct {
 	disconnect chan *chitchat.ChatMessage                        //channel for disconnects
 	message    chan *chitchat.ChatMessage                        //channel for messages
 	lamport    int64                                             // lamport clock
+	shutdown   bool
 }
 
 func (s *ChitChatServer) Message(stream chitchat.ChitChatService_MessageServer) error {
@@ -90,8 +91,9 @@ func main() {
 	}()
 
 	<-stop
-	server.lamport++
+	server.shutdown = true
 	grpcServer.Stop()
+	server.lamport++
 	fmt.Printf("[Lamport: %d] Server has shut down\n", server.lamport)
 }
 
@@ -111,7 +113,9 @@ func (s *ChitChatServer) startBroadcastLoop() {
 			s.lamport++
 			s.broadcast(msg)
 		case msg := <-s.disconnect:
-			s.lamport++
+			if !s.shutdown {
+				s.lamport++
+			}
 			disconnectMsg := &chitchat.ChatMessage{
 				ClientId:    msg.ClientId,
 				Content:     "Participant " + msg.ClientId + " left Chit Chat at logical time " + strconv.FormatInt(s.lamport, 10),

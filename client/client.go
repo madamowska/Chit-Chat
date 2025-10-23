@@ -33,7 +33,6 @@ func main() {
 	clientID := fmt.Sprintf("%d", time.Now().UnixNano()) // i wanted to make the client ids sequential but it's more work so i just used random ids based on timestamp (so unique)
 	lamport := int64(0)
 
-	lamport++
 	stream.Send(&chitchat.ChatMessage{
 		ClientId:    clientID,
 		Content:     "",
@@ -45,19 +44,20 @@ func main() {
 		for {
 			in, err := stream.Recv()
 			if err != nil {
+				lamport++
 				fmt.Printf("[Lamport: %d] Server has shut down\n", lamport)
 				return
 			}
 
-			// Lamport clock update (match server behavior)
 			if in.LogicalTime > lamport {
-				lamport = in.LogicalTime
+				lamport = in.LogicalTime - 1 // -1 because we will increment below
 			}
-			lamport++
 
 			if in.Type == chitchat.MessageType_MESSAGE {
+				lamport++
 				fmt.Printf("[Lamport: %d] %s: %s\n", in.LogicalTime, in.ClientId, in.Content)
 			} else {
+				lamport++
 				fmt.Printf("[Lamport: %d] %s\n", in.LogicalTime, in.Content)
 			}
 		}
@@ -71,7 +71,6 @@ func main() {
 				continue
 			}
 
-			lamport++
 			err := stream.Send(&chitchat.ChatMessage{
 				ClientId:    clientID,
 				Content:     text,

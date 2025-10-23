@@ -30,7 +30,7 @@ func main() {
 		log.Fatalf("did not work")
 	}
 
-	clientID := fmt.Sprintf("Client-%d", time.Now().UnixNano()) // i wanted to make the client ids sequential but it's more work so i just used random ids based on timestamp (so unique)
+	clientID := fmt.Sprintf("%d", time.Now().UnixNano()) // i wanted to make the client ids sequential but it's more work so i just used random ids based on timestamp (so unique)
 	lamport := int64(0)
 
 	lamport++
@@ -45,7 +45,7 @@ func main() {
 		for {
 			in, err := stream.Recv()
 			if err != nil {
-				log.Printf("Disconnected from server: %v", err)
+				fmt.Printf("[Lamport: %d] Server has shut down\n", lamport)
 				return
 			}
 
@@ -55,7 +55,11 @@ func main() {
 			}
 			lamport++
 
-			log.Printf("[%d] %s: %s", in.LogicalTime, in.ClientId, in.Content)
+			if in.Type == chitchat.MessageType_MESSAGE {
+				fmt.Printf("[Lamport: %d] %s: %s\n", in.LogicalTime, in.ClientId, in.Content)
+			} else {
+				fmt.Printf("[Lamport: %d] %s\n", in.LogicalTime, in.Content)
+			}
 		}
 	}()
 

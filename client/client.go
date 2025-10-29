@@ -32,6 +32,7 @@ func main() {
 
 	clientID := fmt.Sprintf("%d", time.Now().UnixNano()) // i wanted to make the client ids sequential but it's more work so i just used random ids based on timestamp (so unique)
 	lamport := int64(0)
+	lamport++
 
 	stream.Send(&chitchat.ChatMessage{
 		ClientId:    clientID,
@@ -55,7 +56,7 @@ func main() {
 				lamport++
 				fmt.Printf("[Lamport: %d] Receiving message from %s: %s\n", lamport, msg.ClientId, msg.Content)
 			} else {
-				fmt.Printf("[Lamport: %d] %s\n", lamport, msg.Content)
+				fmt.Printf("[Lamport: %d] Notification: %s\n", lamport, msg.Content)
 			}
 		}
 	}()

@@ -1,6 +1,10 @@
-2025/10/23 14:10:24 [Lamport: 0] Server started on port 7001
-2025/10/23 14:10:31 Participant 1761221431788904300 joined Chit Chat at logical time 1
-2025/10/23 14:10:34 Participant 1761221434562224700 joined Chit Chat at logical time 2
-2025/10/23 14:10:36 Message from 1761221431788904300 at logical time 4: s
-2025/10/23 14:10:39 Participant 1761221431788904300 left Chit Chat at logical time 5
-2025/10/23 14:10:42 [Lamport: 6] Server has shut down
+2025/10/29 22:25:49 [Lamport: 0] Server started on port 7001
+2025/10/29 22:25:56 [Lamport 1] Participant 1761773156573151300 joined Chit Chat at their logical time 1
+2025/10/29 22:25:56 [Lamport 2] Notification: Participant 1761773156573151300 joined Chit Chat at their logical time 1
+2025/10/29 22:25:59 [Lamport 4] Message from 1761773156573151300 received by everybody at logical time 4: hello
+2025/10/29 22:26:05 [Lamport 5] Participant 1761773165185856500 joined Chit Chat at their logical time 1
+2025/10/29 22:26:05 [Lamport 6] Notification: Participant 1761773165185856500 joined Chit Chat at their logical time 1
+2025/10/29 22:26:09 [Lamport 8] Message from 1761773165185856500 received by everybody at logical time 8: hello 2
+2025/10/29 22:26:16 [Lamport 9] Participant 1761773165185856500 left Chit Chat at their logical time 9
+2025/10/29 22:26:16 [Lamport 10] Notification: Participant 1761773165185856500 left Chit Chat at their logical time 9
+2025/10/29 22:26:23 [Lamport: 11] Server has shut down

@@ -111,24 +111,29 @@ func (s *ChitChatServer) startBroadcastLoop() {
 	for {
 		select {
 		case msg := <-s.connect:
+			s.lamport++
+			log.Printf("[Lamport %d] Participant %s joined Chit Chat at their logical time %d", s.lamport, msg.ClientId, msg.LogicalTime)
 			s.lamport = max(s.lamport, msg.LogicalTime) + 1
+			log.Printf("[Lamport %d] Notification: Participant %s joined Chit Chat at their logical time %d", s.lamport, msg.ClientId, msg.LogicalTime)
 			connectMsg := &chitchat.ChatMessage{
 				ClientId:    msg.ClientId,
-				Content:     "Participant " + msg.ClientId + " joined Chit Chat at logical time " + strconv.FormatInt(s.lamport, 10),
+				Content:     "Participant " + msg.ClientId + " joined Chit Chat at their logical time " + strconv.FormatInt(msg.LogicalTime, 10),
 				LogicalTime: s.lamport,
 				Type:        chitchat.MessageType_CONNECT,
 			}
-			log.Printf("Participant %s joined Chit Chat at logical time %d", msg.ClientId, s.lamport)
+
 			s.broadcast(connectMsg)
 		case msg := <-s.message:
 			s.lamport = max(s.lamport, msg.LogicalTime) + 1
-			log.Printf("Message from %s at logical time %d: %s", msg.ClientId, s.lamport, msg.Content)
+			log.Printf("[Lamport %d] Message from %s received by everybody at logical time %d: %s", s.lamport, msg.ClientId, s.lamport, msg.Content)
 			s.broadcast(msg)
 		case msg := <-s.disconnect:
 			s.lamport = max(s.lamport, msg.LogicalTime)
 			if !s.shutdown {
 				s.lamport++
-				log.Printf("Participant %s left Chit Chat at logical time %d", msg.ClientId, s.lamport)
+				log.Printf("[Lamport %d] Participant %s left Chit Chat at their logical time %d", s.lamport, msg.ClientId, s.lamport)
+				s.lamport++
+				log.Printf("[Lamport %d] Notification: Participant %s left Chit Chat at their logical time %d", s.lamport, msg.ClientId, s.lamport-1)
 			}
 			disconnectMsg := &chitchat.ChatMessage{
 				ClientId:    msg.ClientId,

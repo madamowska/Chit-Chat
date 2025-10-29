@@ -1,6 +1,6 @@
 # Chit-Chat
 
-A simple terminal-based chat app built with **Go** and **gRPC** using **Lamport clocks** to order events.
+A simple terminal-based chat service built with **Go** and **gRPC**.
 
 ---
 
